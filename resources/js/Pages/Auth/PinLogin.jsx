@@ -21,7 +21,7 @@ export default function PinLogin() {
             <Head title="Login" />
             <div className="flex flex-col items-center justify-center">
                 <div className="max-w-120 flex-col items-center justify-center space-y-20">
-                    <div className="space-y-10 pt-20 px-4 md:px-0 pt-0">
+                    <div className="space-y-10 pt-40 px-4 md:px-0 pt-0">
                         <div className="flex items-center justify-center w-full md:hidden">
                             <img
                                 src="/assets/logo.png"
@@ -36,7 +36,7 @@ export default function PinLogin() {
                                 Task Management System
                             </p>
                             <p className="text-gray-600 text-center dark:text-gray-200">
-                                Please enter your Login credentials.
+                                Please enter your pin to login
                             </p>
                         </div>
                         <form className="w-full space-y-4">
