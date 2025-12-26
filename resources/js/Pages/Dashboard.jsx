@@ -1,9 +1,59 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import MainContainer from '@/Components/DivContainer/MainContainer';
 import PrimaryCard from '@/Components/DivContainer/PrimaryCard';
+import TableContainer from '@/Components/DivContainer/TableContainer';
+import Table from '@/Components/Table/Table';
+import TableHeader from '@/Components/Table/TableHeader';
+import TableRow from '@/Components/Table/TableRow';
+import TableData from '@/Components/Table/TableData';
+import DivisionContainer from '@/Components/Misc/DivisionContainer';
 import { Head } from '@inertiajs/react';
 
 export default function Dashboard({ task_counts = {}, recent_tasks = [], tasks_by_division = [] }) {
+
+    const DivisionCard = ({ division }) => {
+        return (
+            <div className="mb-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-5">
+                <div className="space-y-4">
+                    <div>
+                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Division:</span>
+                        <div className="mt-2">
+                            <DivisionContainer bgcolor={division.division_color}>
+                                {division.division_name}
+                            </DivisionContainer>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Not Started:</span>
+                            <p className="text-lg font-bold text-gray-600 dark:text-gray-400 mt-1">
+                                {division.not_started || 0}
+                            </p>
+                        </div>
+                        <div>
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">In Progress:</span>
+                            <p className="text-lg font-bold text-orange-600 dark:text-orange-400 mt-1">
+                                {division.in_progress || 0}
+                            </p>
+                        </div>
+                        <div>
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Completed:</span>
+                            <p className="text-lg font-bold text-green-600 dark:text-green-400 mt-1">
+                                {division.completed || 0}
+                            </p>
+                        </div>
+                        <div>
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Total:</span>
+                            <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mt-1">
+                                {division.total_tasks || 0}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <AuthenticatedLayout
             header={
@@ -79,6 +129,93 @@ export default function Dashboard({ task_counts = {}, recent_tasks = [], tasks_b
                             </div>
                         </div>
                     </PrimaryCard>
+                </div>
+
+                <div>
+                    <TableContainer
+                        tableIcon="🚩"
+                        tableTitle="Tasks by Division"
+                        borderColor="border-purple-500"
+                    >
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block">
+                            <Table
+                                thead={
+                                    <tr>
+                                        <TableHeader>Division</TableHeader>
+                                        <TableHeader>Not Started</TableHeader>
+                                        <TableHeader>In Progress</TableHeader>
+                                        <TableHeader>Completed</TableHeader>
+                                        <TableHeader>Total</TableHeader>
+                                    </tr>
+                                }
+                                tbody={
+                                    <>
+                                        {tasks_by_division.length > 0 ? (
+                                            tasks_by_division.map(division => (
+                                                <TableRow key={division.id}>
+                                                    <TableData
+                                                        className="text-center"
+                                                    >
+                                                        <DivisionContainer bgcolor={division.division_color}>
+                                                            {division.division_name}
+                                                        </DivisionContainer>
+                                                    </TableData>
+                                                    <TableData
+                                                        className="text-center"
+                                                    >
+                                                        <span className="text-gray-600 dark:text-gray-400 font-semibold">
+                                                            {division.not_started || 0}
+                                                        </span>
+                                                    </TableData>
+                                                    <TableData
+                                                        className="text-center"
+                                                    >
+                                                        <span className="text-orange-600 dark:text-orange-400 font-semibold">
+                                                            {division.in_progress || 0}
+                                                        </span>
+                                                    </TableData>
+                                                    <TableData
+                                                        className="text-center"
+                                                    >
+                                                        <span className="text-green-600 dark:text-green-400 font-semibold">
+                                                            {division.completed || 0}
+                                                        </span>
+                                                    </TableData>
+                                                    <TableData
+                                                        className="text-center"
+                                                    >
+                                                        <span className="text-blue-600 dark:text-blue-400 font-bold">
+                                                            {division.total_tasks || 0}
+                                                        </span>
+                                                    </TableData>
+                                                </TableRow>
+                                            ))
+                                        ) : (
+                                            <TableRow
+                                                colspan={5}
+                                            >
+                                                No task by division
+                                            </TableRow>
+                                        )}
+                                    </>
+                                }
+                            />
+                        </div>
+
+                        {/* Mobile Card View */}
+                        <div className="block md:hidden">
+                            {tasks_by_division.length > 0 ? (
+                                tasks_by_division.map(division => (
+                                    <DivisionCard key={division.id} division={division} />
+                                ))
+                            ) : (
+                                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                                    No task by division
+                                </div>
+                            )}
+                        </div>
+                    </TableContainer>
                 </div>
             </MainContainer>
         </AuthenticatedLayout>
