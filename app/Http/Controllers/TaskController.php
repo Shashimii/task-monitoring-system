@@ -23,42 +23,52 @@ class TaskController extends Controller
         $employees = Employee::orderBy('last_name', 'asc')->get();
 
         // Get page numbers for each table separately
+        $taskAllPage = $request->get('task_all_page', 1);
         $notStartedPage = $request->get('not_started_page', 1);
         $inProgressPage = $request->get('in_progress_page', 1);
         $completedPage = $request->get('completed_page', 1);
 
         // Get search parameters for each table
+        $taskAllSearch = $request->get('task_all_search', '');
         $notStartedSearch = $request->get('not_started_search', '');
         $inProgressSearch = $request->get('in_progress_search', '');
         $completedSearch = $request->get('completed_search', '');
 
         // Get sort order for each table (asc or desc, default to desc)
+        $taskAllSort = $request->get('task_all_sort', 'desc');
         $notStartedSort = $request->get('not_started_sort', 'desc');
         $inProgressSort = $request->get('in_progress_sort', 'desc');
         $completedSort = $request->get('completed_sort', 'desc');
 
         // Validate sort order
+        $taskAllSort = in_array($taskAllSort, ['asc', 'desc']) ? $taskAllSort : 'desc';
         $notStartedSort = in_array($notStartedSort, ['asc', 'desc']) ? $notStartedSort : 'desc';
         $inProgressSort = in_array($inProgressSort, ['asc', 'desc']) ? $inProgressSort : 'desc';
         $completedSort = in_array($completedSort, ['asc', 'desc']) ? $completedSort : 'desc';
 
         // Helper function to apply search
-        $applySearch = function($query, $search) {
+        $applySearch = function ($query, $search) {
             if (!empty($search)) {
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', '%' . $search . '%')
-                      ->orWhere('last_action', 'like', '%' . $search . '%')
-                      ->orWhereHas('employee', function($empQuery) use ($search) {
-                          $empQuery->where('first_name', 'like', '%' . $search . '%')
-                                   ->orWhere('last_name', 'like', '%' . $search . '%');
-                      })
-                      ->orWhereHas('division', function($divQuery) use ($search) {
-                          $divQuery->where('division_name', 'like', '%' . $search . '%');
-                      });
+                        ->orWhere('last_action', 'like', '%' . $search . '%')
+                        ->orWhereHas('employee', function ($empQuery) use ($search) {
+                            $empQuery->where('first_name', 'like', '%' . $search . '%')
+                                ->orWhere('last_name', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('division', function ($divQuery) use ($search) {
+                            $divQuery->where('division_name', 'like', '%' . $search . '%');
+                        });
                 });
             }
             return $query;
         };
+
+        $taskAll = $applySearch(
+            Task::with('division', 'employee')
+                ->orderBy('created_at', $taskAllSort),
+            $taskAllSearch
+        )->paginate(7, ['*'], 'task_all_page', $taskAllPage);
 
         $notStarted = $applySearch(
             Task::with('division', 'employee')
@@ -84,7 +94,16 @@ class TaskController extends Controller
         return Inertia::render('Task', [
             'divisions_data' => $divisions,
             'employees_data' => $employees,
-            
+
+            'taskAll' => [
+                'data' => TaskResource::collection($taskAll->items())->resolve(),
+                'links' => $taskAll->linkCollection()->toArray(),
+                'current_page' => $taskAll->currentPage(),
+                'last_page' => $taskAll->lastPage(),
+                'per_page' => $taskAll->perPage(),
+                'total' => $taskAll->total(),
+            ],
+
             'notStarted' => [
                 'data' => TaskResource::collection($notStarted->items())->resolve(),
                 'links' => $notStarted->linkCollection()->toArray(),
@@ -109,13 +128,15 @@ class TaskController extends Controller
                 'per_page' => $completed->perPage(),
                 'total' => $completed->total(),
             ],
-    
+
             'search_params' => [
+                'task_all_search' => $taskAllSearch,
                 'not_started_search' => $notStartedSearch,
                 'in_progress_search' => $inProgressSearch,
                 'completed_search' => $completedSearch,
             ],
             'sort_params' => [
+                'task_all_sort' => $taskAllSort,
                 'not_started_sort' => $notStartedSort,
                 'in_progress_sort' => $inProgressSort,
                 'completed_sort' => $completedSort,
@@ -259,35 +280,35 @@ class TaskController extends Controller
         $changes = [];
         foreach ($newValues as $key => $newValue) {
             $originalValue = $original[$key] ?? null;
-            
+
             // Special handling for due_date - normalize dates for comparison
             if ($key === 'due_date') {
                 try {
                     // Normalize both dates to Y-m-d format for comparison (ignoring time)
                     $originalDate = null;
                     $newDate = null;
-                    
+
                     if ($originalValue) {
-                        $originalDate = is_string($originalValue) 
+                        $originalDate = is_string($originalValue)
                             ? \Carbon\Carbon::parse($originalValue)->format('Y-m-d')
                             : $originalValue->format('Y-m-d');
                     }
-                    
+
                     if ($newValue) {
                         $newDate = \Carbon\Carbon::parse($newValue)->format('Y-m-d');
                     }
-                    
+
                     // Only track if dates are actually different
                     if ($originalDate !== $newDate) {
-                        $fromFormatted = $originalValue 
-                            ? (is_string($originalValue) 
+                        $fromFormatted = $originalValue
+                            ? (is_string($originalValue)
                                 ? \Carbon\Carbon::parse($originalValue)->format('m/d/Y')
                                 : $originalValue->format('m/d/Y'))
                             : 'N/A';
-                        $toFormatted = $newValue 
+                        $toFormatted = $newValue
                             ? \Carbon\Carbon::parse($newValue)->format('m/d/Y')
                             : 'N/A';
-                        
+
                         $changes[$key] = [
                             'from' => $fromFormatted,
                             'to' => $toFormatted,
@@ -304,17 +325,19 @@ class TaskController extends Controller
                 }
                 continue;
             }
-            
+
             // Compare values (handle null comparisons)
-            if ($originalValue != $newValue || 
-                ($originalValue === null && $newValue !== null) || 
-                ($originalValue !== null && $newValue === null)) {
-                
+            if (
+                $originalValue != $newValue ||
+                ($originalValue === null && $newValue !== null) ||
+                ($originalValue !== null && $newValue === null)
+            ) {
+
                 // Resolve IDs to names for display
                 $fromValue = $originalValue;
                 $toValue = $newValue;
                 $displayKey = $key;
-                
+
                 if ($key === 'employee_id') {
                     $displayKey = 'assignee';
                     // Resolve original employee name
@@ -324,7 +347,7 @@ class TaskController extends Controller
                     } else {
                         $fromValue = 'N/A';
                     }
-                    
+
                     // Resolve new employee name
                     if ($newValue) {
                         $newEmployee = Employee::find($newValue);
@@ -341,7 +364,7 @@ class TaskController extends Controller
                     } else {
                         $fromValue = 'N/A';
                     }
-                    
+
                     // Resolve new division name
                     if ($newValue) {
                         $newDivision = Division::find($newValue);
@@ -350,7 +373,7 @@ class TaskController extends Controller
                         $toValue = 'N/A';
                     }
                 }
-                
+
                 $changes[$displayKey] = [
                     'from' => $fromValue,
                     'to' => $toValue,
