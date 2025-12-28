@@ -20,6 +20,7 @@ export default function Pagination({ links = [], current_page = 1, per_page = 7,
 
     // Map table types to their page parameter names
     const pageParamMap = {
+        'task_all' : 'task_all_page',
         'not_started': 'not_started_page',
         'in_progress': 'in_progress_page',
         'completed': 'completed_page',
