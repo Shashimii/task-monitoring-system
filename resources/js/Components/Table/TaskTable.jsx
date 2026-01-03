@@ -277,7 +277,7 @@ export default function TaskTable({
         <div className="flex gap-4">
             <PrimaryInput
                 type="text"
-                placeholder="Search Tasks..."
+                placeholder="Search Task, Assignee, Division, Last Action..."
                 value={searchValues}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 className="flex-1 w-[22rem]"
@@ -338,7 +338,7 @@ export default function TaskTable({
                 <TableRow
                     key={task.id}
                     onClick={isEditActive[task.id] ? undefined : () => onRowClick(task)}
-                    className="cursor-pointer"
+                    className={isEditActive[task.id] ? '' : 'cursor-pointer'}
                 >
                     {!isEditActive[task.id] && (
                         <>
@@ -469,6 +469,7 @@ export default function TaskTable({
                         {!isEditActive[task.id] && (
                             <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
                                 <IconButton
+                                    tooltip="Edit Task"
                                     onClick={() => ToggleEdit(task)}
                                     isDisabled={editProcessing}
                                     iconColor="blue-600"
@@ -479,6 +480,7 @@ export default function TaskTable({
                                     }
                                 />
                                 <IconButton
+                                    tooltip="Delete Task"
                                     onClick={() => deleteTask(task.id)}
                                     isDisabled={editProcessing}
                                     iconColor="red-600"
@@ -494,6 +496,7 @@ export default function TaskTable({
                         {isEditActive[task.id] && (
                             <div className="flex items-center gap-3">
                                 <IconButton
+                                    tooltip="Save Changes"
                                     onClick={() => saveEdit(task.id)}
                                     iconColor="green-600"
                                     isDisabled={editProcessing}
@@ -504,6 +507,7 @@ export default function TaskTable({
                                     }
                                 />
                                 <IconButton
+                                    tooltip="Cancel Edit"
                                     onClick={() => ToggleEdit(task)}
                                     iconColor="red-600"
                                     isDisabled={editProcessing}
