@@ -212,6 +212,7 @@ export default function TaskTable({
                 status: formatStatusToDb(task.status) || '',
                 priority: formatPriorityToDb(task.priority) || '',
                 due_date: task.due_date || '',
+                description: task.description || '',
             });
 
             return next;

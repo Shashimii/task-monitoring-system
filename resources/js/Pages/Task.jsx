@@ -62,7 +62,7 @@ export default function Task() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [taskAll.data, notStarted.data, inProgress.data, completed.data]);
-    
+
     const handleRowClick = (task) => {
         setOpen(true);
         setViewedTask(task);
@@ -103,7 +103,8 @@ export default function Task() {
         last_action: '',
         status: '',
         priority: '',
-        due_date: ''
+        due_date: '',
+        description: ''
     })
 
     // Not Started
@@ -121,7 +122,8 @@ export default function Task() {
         last_action: '',
         status: '',
         priority: '',
-        due_date: ''
+        due_date: '',
+        description: ''
     })
 
     // In Progress
@@ -139,7 +141,8 @@ export default function Task() {
         last_action: '',
         status: '',
         priority: '',
-        due_date: ''
+        due_date: '',
+        description: ''
     })
 
     // Completed
@@ -157,7 +160,8 @@ export default function Task() {
         last_action: '',
         status: '',
         priority: '',
-        due_date: ''
+        due_date: '',
+        description: ''
     })
 
     // Delete Task
