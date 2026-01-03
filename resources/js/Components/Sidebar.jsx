@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import StatusContainer from "./Misc/StatusContainer";
 import PriorityContainer from "./Misc/PriorityContainer";
@@ -11,8 +11,14 @@ export default function Sidebar({ open, onClose, task }) {
     const [editDescriptionId, setEditDescriptionId] = useState(null);
     const [descriptionValue, setDescriptionValue] = useState(task?.description || "");
 
+    // Sync descriptionValue with task prop when task changes
+    useEffect(() => {
+        setDescriptionValue(task?.description || "");
+    }, [task?.description]);
+
     const ToggleDescriptionEdit = (task) => {
         setEditDescriptionId(task.id);
+        setDescriptionValue(task?.description || "");
         console.table(task);
     }
 
@@ -22,9 +28,10 @@ export default function Sidebar({ open, onClose, task }) {
         },
             {
                 preserveScroll: true,
+                preserveState: true,
                 onSuccess: () => {
                     setEditDescriptionId(null);
-                    setDescriptionValue("");
+                    
                 }
             }
         );
@@ -78,7 +85,7 @@ export default function Sidebar({ open, onClose, task }) {
                                 />
                             ) : (
                                 <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold italic">
-                                    {task?.description ? task?.description : "No description."}
+                                    {descriptionValue ? descriptionValue : "No description."}
                                 </p>
                             )}
 
