@@ -8,15 +8,6 @@ import Sidebar from "@/Components/Sidebar";
 
 
 export default function Task() {
-    // Header Title
-    const HEADER_CONTENT = (
-        <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                Tasks
-            </h2>
-        </div>
-    )
-
     // Props
     const { props } = usePage();
     const {
@@ -188,7 +179,7 @@ export default function Task() {
 
     return (
         <AuthenticatedLayout
-            header={HEADER_CONTENT}
+            header="Tasks"
         >
             <Head title="Tasks" />
 

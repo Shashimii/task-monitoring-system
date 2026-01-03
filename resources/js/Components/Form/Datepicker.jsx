@@ -23,7 +23,7 @@ export default function Datepicker({ label, value, onChange }) {
                         variant="outline"
                         data-empty={value ? "false" : "true"}
                         className={cn(
-                            "w-full justify-between font-normal bg-transparent",
+                            "w-full justify-between font-normal bg-background",
                             !value && "text-muted-foreground"
                         )}
                     >

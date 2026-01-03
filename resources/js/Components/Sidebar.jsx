@@ -50,12 +50,12 @@ export default function Sidebar({ open, onClose, task }) {
             />
 
             <div
-                className={`fixed top-0 right-0 h-full w-160 bg-white dark:bg-stone-800 shadow-lg z-100
+                className={`fixed top-0 right-0 h-full w-160 bg-white dark:bg-zinc-800 shadow-lg z-100
                     transform transition-transform duration-300 ease-in-out
                     ${open ? "translate-x-0" : "translate-x-full"}`}
             >
-                <div className="p-4 flex justify-between items-center border-b">
-                    <button onClick={onClose}>✕</button>
+                <div className="py-5 px-4 flex justify-between items-center border-b">
+                    <button className="cursor-pointer" title="close task view" onClick={onClose}>✕</button>
                 </div>
 
                 <div className="p-4 space-y-6">
@@ -97,7 +97,7 @@ export default function Sidebar({ open, onClose, task }) {
 
                             {editDescriptionId != task?.id && (
                                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition flex items-end justify-end p-2">
-                                    <span className="text-xs text-gray-600 bg-white dark:text-white dark:bg-stone-800 px-2 py-1 rounded shadow">
+                                    <span className="text-xs text-gray-600 bg-white dark:text-white dark:bg-zinc-800 px-2 py-1 rounded shadow">
                                         ✏️ Edit Description
                                     </span>
                                 </div>

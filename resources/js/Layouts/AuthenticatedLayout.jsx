@@ -15,8 +15,8 @@ export default function AuthenticatedLayout({ header, children }) {
 
     return (
         <ThemeProvider>
-            <div className="min-h-screen bg-gradient-to-tr from-green-200 via-gray-200 to-emerald-200 dark:bg-gray-900 dark:bg-none">
-                <nav className="border-b border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 sticky top-0 z-10">
+            <div className="min-h-screen bg-gradient-to-tr from-green-200 via-gray-200 to-emerald-200 dark:bg-zinc-800 dark:bg-none">
+                <nav className="border-b border-gray-100 bg-white dark:border-stone-800 dark:bg-zinc-900 sticky top-0 z-10">
                     <div className="mx-auto max-w-[100rem] px-4 sm:px-6 lg:px-8">
                         <div className="flex h-16 justify-between">
                             <div className="flex">
@@ -177,9 +177,11 @@ export default function AuthenticatedLayout({ header, children }) {
                 </nav>
 
                 {header && (
-                    <header className="bg-white shadow dark:bg-gray-800 sticky top-0 z-2">
+                    <header className="bg-white shadow dark:bg-zinc-900 sticky top-0 z-2">
                         <div className="mx-auto max-w-[100rem] px-4 py-6 sm:px-6 lg:px-8">
-                            {header}
+                            <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+                                {header}
+                            </h2>
                         </div>
                     </header>
                 )}

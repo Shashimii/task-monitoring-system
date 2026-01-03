@@ -56,11 +56,7 @@ export default function Dashboard({ task_counts = {}, recent_tasks = [], tasks_b
 
     return (
         <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Dashboard
-                </h2>
-            }
+            header="Dashboard"
         >
             <Head title="Dashboard" />
 
@@ -226,7 +222,7 @@ export default function Dashboard({ task_counts = {}, recent_tasks = [], tasks_b
                         </div>
                         {recent_tasks.length > 0 ? (
                             recent_tasks.map(task => (
-                                <div key={task.id} className="bg-white p-4 border border-gray-300 rounded-lg shadow-lg dark:bg-black dark:border-stone-800">
+                                <div key={task.id} className="bg-white p-4 border border-gray-300 rounded-lg shadow-lg dark:bg-zinc-900 dark:border-stone-800">
                                     <div className="flex items-center space-x-4">
                                         <div className="px-4 py-4 bg-green-200 rounded-md text-green-800">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
