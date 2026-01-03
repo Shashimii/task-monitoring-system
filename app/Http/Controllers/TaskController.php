@@ -231,6 +231,36 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
+        if ($request->has('description')) {
+            $validated = $request->validate([
+                'description' => 'nullable|string',
+            ]);
+
+            $originalDescription = $task->description;
+            $newDescription = $validated['description'] ?? null;
+
+            $task->update([
+                'description' => $newDescription,
+            ]);
+
+            // Log activity for description update
+            Activity::create([
+                'action' => 'updated',
+                'model_type' => Task::class,
+                'model_id' => $task->id,
+                'description' => "Task '{$task->name}' description was updated",
+                'changes' => [
+                    'description' => [
+                        'from' => $originalDescription ?? 'N/A',
+                        'to' => $newDescription ?? 'N/A',
+                    ],
+                ],
+                'user_id' => Auth::id(),
+            ]);
+
+            return redirect()->route('task.index');
+        }
+
         $validated = $request->validate([
             'task_name' => 'sometimes|required|string|max:255',
             'assignee' => 'sometimes|nullable|string|max:255',
