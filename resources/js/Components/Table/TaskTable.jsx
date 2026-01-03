@@ -99,10 +99,10 @@ export default function TaskTable({
         // On initial mount, handle the empty URL case
         if (isInitialMount.current) {
             isInitialMount.current = false;
-            
+
             // If all params for this table already exist and match, skip update
-            if (existingSort === String(sortValues) && 
-                existingSearch === String(searchValues) && 
+            if (existingSort === String(sortValues) &&
+                existingSearch === String(searchValues) &&
                 existingPage === String(pageValues)) {
                 return; // Params already match, no need to update
             }
@@ -113,20 +113,20 @@ export default function TaskTable({
             if (urlIsEmpty) {
                 const tableOrder = { 'task_all': 0, 'not_started': 1, 'in_progress': 2, 'completed': 3 };
                 const delay = (tableOrder[tableType] || 0) * 10; // 10ms stagger between tables
-                
+
                 setTimeout(() => {
                     // Re-read URL params after previous tables may have initialized
                     const latestParams = Object.fromEntries(
                         new URLSearchParams(window.location.search)
                     );
-                    
+
                     const searchUrl = {
                         ...latestParams,
                         [sortParam]: sortValues,
                         [searchParam]: searchValues,
                         [pageParam]: pageValues,
                     };
-                    
+
                     router.get(route('task.index'), searchUrl, {
                         preserveState: true,
                         preserveScroll: true,
@@ -557,12 +557,19 @@ export default function TaskTable({
                             <TableData>
                                 {task?.last_action}
                             </TableData>
-                            <TableData>
-                                <StatusContainer
-                                    status={task?.status}
-                                >
-                                    {task?.status}
-                                </StatusContainer>
+                            <TableData
+                                className={`text-center font-semibold text-md ${task?.status === 'Not Started'
+                                        ? 'bg-slate-300 text-slate-800 dark:bg-slate-700 dark:text-slate-100'
+                                        : task?.status === 'In Progress'
+                                            ? 'bg-orange-200 text-amber-900 dark:bg-amber-700 dark:text-amber-100'
+                                            : task?.status === 'Completed'
+                                                ? 'bg-emerald-200 text-emerald-900 dark:bg-emerald-700 dark:text-emerald-100'
+                                                : ''
+                                    }`
+                                }
+                            >
+                                {task?.status}
+
                             </TableData>
                             <TableData
                                 className="text-center"
