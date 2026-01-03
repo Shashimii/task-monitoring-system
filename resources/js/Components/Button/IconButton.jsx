@@ -1,7 +1,8 @@
-export default function IconButton({icon, iconColor, onClick, isDisabled=false }) {
+export default function IconButton({ icon, iconColor, onClick, tooltip = "This is a tooltip!", isDisabled = false }) {
     return (
-        <button 
-            className={`text-${iconColor} hover:text-${iconColor}-dark focus:outline-none`} 
+        <button
+            title={tooltip}
+            className={`text-${iconColor} hover:text-${iconColor}-dark focus:outline-none cursor-pointer disabled:cursor-not-allowed`}
             onClick={onClick}
             disabled={isDisabled}
         >
