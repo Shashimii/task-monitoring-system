@@ -36,13 +36,13 @@ export default function PinLogin() {
                                 Task Management System
                             </p>
                             <p className="text-gray-600 text-center dark:text-gray-200">
-                                Please enter your pin to login
+                                Please enter your password to login
                             </p>
                         </div>
                         <form className="w-full space-y-4">
                             <PrimaryInput
                                 type="password"
-                                placeholder="Pin"
+                                placeholder="Password"
                                 value={data.pin}
                                 onChange={(e) => setData("pin", e.target.value)}
                                 error={errors.pin}
