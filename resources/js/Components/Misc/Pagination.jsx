@@ -142,8 +142,8 @@ export default function Pagination({ links = [], current_page = 1, per_page = 7,
                 new URLSearchParams(window.location.search)
             );
 
-            // Convert Laravel pagination ?page=2 → ?not_started_page=2
-            if (params.page && pageParam) {
+            // Convert Laravel pagination ?page=2 → ?not_started_page=2 (only for custom page params)
+            if (params.page && pageParam && pageParam !== 'page') {
                 params = {
                     ...params,
                     [pageParam]: params.page
@@ -158,8 +158,10 @@ export default function Pagination({ links = [], current_page = 1, per_page = 7,
                 ...params,
             };
 
-            // Remove generic default page param if it exists
-            delete finalParams.page;
+            // Remove generic default page param only if we're using a custom page param
+            if (pageParam !== 'page') {
+                delete finalParams.page;
+            }
 
             router.get(urlObj.pathname, finalParams, {
                 preserveState: true,
