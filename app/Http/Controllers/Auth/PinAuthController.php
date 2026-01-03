@@ -28,7 +28,7 @@ class PinAuthController extends Controller
 
         if (!$user) {
             return back()->withErrors([
-                'pin' => 'Invalid PIN.',
+                'pin' => 'Invalid Password.',
             ]);
         }
 
