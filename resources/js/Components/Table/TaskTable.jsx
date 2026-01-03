@@ -348,7 +348,9 @@ export default function TaskTable({
                             <TableData>
                                 {task?.employee?.first_name} {task?.employee?.last_name}
                             </TableData>
-                            <TableData>
+                            <TableData
+                                className="text-center"
+                            >
                                 <DivisionContainer
                                     bgcolor={task?.division?.division_color}
                                 >
