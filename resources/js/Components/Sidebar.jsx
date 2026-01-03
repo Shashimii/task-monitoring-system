@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
+import { toast } from 'sonner';
 import StatusContainer from "./Misc/StatusContainer";
 import PriorityContainer from "./Misc/PriorityContainer";
 import DivisionContainer from "./Misc/DivisionContainer";
@@ -31,7 +32,11 @@ export default function Sidebar({ open, onClose, task }) {
                 preserveState: true,
                 onSuccess: () => {
                     setEditDescriptionId(null);
-                    
+                    toast.success("Description updated");
+                },
+                onError: (errors) => {
+                    const messages = Object.values(errors).flat().join(" ");
+                    toast.error(messages || "Something went wrong");
                 }
             }
         );
