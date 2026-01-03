@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Division;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class DivisionsController extends Controller
 {
@@ -13,7 +14,7 @@ class DivisionsController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('Division', []);
     }
 
     /**

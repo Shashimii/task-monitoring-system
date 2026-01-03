@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DivisionsController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TimelineController;
@@ -22,6 +24,12 @@ Route::middleware('auth')->group(function () {
 
     // Tasks
     Route::resource('task', TaskController::class);
+
+    // Assignee
+    Route::resource('assignee', EmployeeController::class);
+
+    // Division
+    Route::resource('division', DivisionsController::class);
 
     // Timeline
     Route::resource('timeline', TimelineController::class);
