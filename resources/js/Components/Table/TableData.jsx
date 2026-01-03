@@ -1,10 +1,19 @@
-export default function TableData({ children, colSpan, className = "" }) {
-    const baseClassName = "w-[150px] min-w-[150px] max-w-[190px] px-4 py-3 text-sm dark:text-white text-lg font-semibold truncate";
-    const combinedClassName = className ? `${baseClassName} ${className}` : baseClassName;
-    
+export default function TableData({ children, colSpan, customWidth = "", className = "" }) {
+    let baseClassName = "px-4 py-3 text-sm dark:text-white font-semibold truncate";
+
+    if (customWidth === "") {
+        baseClassName = "min-w-[150px] max-w-[150px] px-2 py-3 text-sm dark:text-white font-semibold truncate";
+    } else {
+        baseClassName = "px-4 py-3 text-sm dark:text-white font-semibold truncate";
+    }
+
     return (
-        <td className={combinedClassName} colSpan={colSpan}>
+        <td
+            className={`${baseClassName} ${customWidth} ${className}`}
+            colSpan={colSpan}
+            title={typeof children === "string" ? children : undefined}
+        >
             {children}
         </td>
-    )
+    );
 }

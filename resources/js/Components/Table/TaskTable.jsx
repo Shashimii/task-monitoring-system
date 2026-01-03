@@ -421,7 +421,9 @@ export default function TaskTable({
 
                     {isAddActive && (
                         <TableRow>
-                            <TableData>
+                            <TableData
+                                customWidth="min-w-[250px] max-w-[200px]"
+                            >
                                 <PrimaryInput
                                     type="text"
                                     placeholder="Task"
@@ -535,7 +537,9 @@ export default function TaskTable({
                 >
                     {!isEditActive[task.id] && (
                         <>
-                            <TableData>
+                            <TableData
+                                customWidth="min-w-[250px] max-w-[200px]"
+                            >
                                 {task?.name}
                             </TableData>
                             <TableData>
@@ -733,7 +737,9 @@ export default function TaskTable({
 
                     {isAddActive && (
                         <TableRow>
-                            <TableData>
+                            <TableData
+                                customWidth="min-w-[250px] max-w-[200px]"
+                            >
                                 <PrimaryInput
                                     type="text"
                                     placeholder="Task"
