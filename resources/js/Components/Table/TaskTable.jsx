@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { router } from "@inertiajs/react";
 import { SelectItem } from "@/components/ui/select"
 import { toast } from 'sonner';
@@ -69,6 +69,7 @@ export default function TaskTable({
     const [searchValues, setSearchValues] = useState(search || '');
     const [sortValues, setSortValues] = useState(sort || 'desc');
     const [pageValues, setPageValues] = useState(page || 1);
+    const isInitialMount = useRef(true);
 
     // Set
     const handleSearchChange = (value) => {
@@ -90,13 +91,71 @@ export default function TaskTable({
             new URLSearchParams(window.location.search)
         );
 
+        // Check if this table's params already exist and match current state
+        const existingSort = currentParams[sortParam];
+        const existingSearch = currentParams[searchParam];
+        const existingPage = currentParams[pageParam];
+
+        // On initial mount, handle the empty URL case
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            
+            // If all params for this table already exist and match, skip update
+            if (existingSort === String(sortValues) && 
+                existingSearch === String(searchValues) && 
+                existingPage === String(pageValues)) {
+                return; // Params already match, no need to update
+            }
+
+            // If URL is completely empty, stagger initialization to prevent race conditions
+            // Each table adds a small delay based on its type to ensure params are added sequentially
+            const urlIsEmpty = Object.keys(currentParams).length === 0;
+            if (urlIsEmpty) {
+                const tableOrder = { 'task_all': 0, 'not_started': 1, 'in_progress': 2, 'completed': 3 };
+                const delay = (tableOrder[tableType] || 0) * 10; // 10ms stagger between tables
+                
+                setTimeout(() => {
+                    // Re-read URL params after previous tables may have initialized
+                    const latestParams = Object.fromEntries(
+                        new URLSearchParams(window.location.search)
+                    );
+                    
+                    const searchUrl = {
+                        ...latestParams,
+                        [sortParam]: sortValues,
+                        [searchParam]: searchValues,
+                        [pageParam]: pageValues,
+                    };
+                    
+                    router.get(route('task.index'), searchUrl, {
+                        preserveState: true,
+                        preserveScroll: true,
+                        replace: true
+                    });
+                }, delay);
+                return;
+            }
+        }
+
+        // Check if update is needed (params missing or different)
+        const sortChanged = existingSort !== String(sortValues);
+        const searchChanged = existingSearch !== String(searchValues);
+        const pageChanged = existingPage !== String(pageValues);
+
+        // Only update if something changed
+        if (!sortChanged && !searchChanged && !pageChanged) {
+            return;
+        }
+
+        // When sorting changes, preserve current page from URL if available
+        const pageToUse = existingPage || pageValues;
+
         const searchUrl = {
             ...currentParams,
             [sortParam]: sortValues,
             [searchParam]: searchValues,
-            [pageParam]: pageValues,
+            [pageParam]: pageToUse,
         }
-
 
         router.get(route('task.index'), searchUrl, {
             preserveState: true,
