@@ -79,7 +79,7 @@ class EmployeeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Employee $employee)
+    public function show(Employee $assignee)
     {
         //
     }
@@ -87,7 +87,7 @@ class EmployeeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Employee $employee)
+    public function edit(Employee $assignee)
     {
         //
     }
@@ -95,7 +95,7 @@ class EmployeeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Employee $employee)
+    public function update(Request $request, Employee $assignee)
     {
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
@@ -104,12 +104,11 @@ class EmployeeController extends Controller
             'division_id' => 'required|exists:divisions,id',
         ]);
 
-        $employee->update([
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'],
-            'position' => $validated['position'],
-            'division_id' => $validated['division_id'],
-        ]);
+        $assignee->first_name = $validated['first_name'];
+        $assignee->last_name = $validated['last_name'];
+        $assignee->position = $validated['position'];
+        $assignee->division_id = (int) $validated['division_id'];
+        $assignee->save();
 
         return back()->with('success', 'Employee updated successfully!');
     }
@@ -117,9 +116,9 @@ class EmployeeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Employee $employee)
+    public function destroy(Employee $assignee)
     {
-        $employee->delete();
+        $assignee->delete();
 
         return back()->with('success', 'Employee deleted successfully!');
     }
