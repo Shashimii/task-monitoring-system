@@ -207,8 +207,12 @@ export default function TaskDrawer({
             {/* Drawer */}
             <div
                 className={`fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-800 shadow-lg z-[100] rounded-t-2xl
-                    transform transition-transform duration-300 ease-in-out max-h-[90vh] overflow-y-auto
+                    transform transition-transform duration-300 ease-in-out max-h-[90vh] overflow-y-auto drawer-scrollbar
                     ${open ? "translate-y-0" : "translate-y-full"}`}
+                style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: 'rgb(156 163 175) rgb(229 231 235)'
+                }}
             >
                 {/* Header */}
                 <div className="sticky top-0 bg-white dark:bg-zinc-800 border-b border-gray-200 dark:border-gray-700 px-4 py-4 flex justify-between items-center z-10">

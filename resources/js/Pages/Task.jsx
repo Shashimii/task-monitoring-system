@@ -31,15 +31,22 @@ export default function Task() {
     const [isAddMode, setIsAddMode] = useState(false);
     const [activeTableType, setActiveTableType] = useState('');
 
+    // Prevent body scroll when drawer or sidebar is open
     useEffect(() => {
-        if (drawerOpen || sidebarOpen) {
+        const isOpen = drawerOpen || sidebarOpen;
+        
+        if (isOpen) {
             document.body.style.overflow = 'hidden';
         } else {
-            document.body.style.overflow = 'auto';
+            // Remove the inline style to restore default behavior
+            document.body.style.removeProperty('overflow');
         }
 
         return () => {
-            document.body.style.overflow = 'auto';
+            // Cleanup: ensure overflow is restored on unmount
+            if (!drawerOpen && !sidebarOpen) {
+                document.body.style.removeProperty('overflow');
+            }
         }
     }, [drawerOpen, sidebarOpen]);
 
@@ -66,6 +73,7 @@ export default function Task() {
         setIsAddMode(false);
         // Use drawer for mobile, sidebar for desktop
         // We'll detect screen size or use CSS to show/hide
+        // Open both - CSS will show/hide appropriately
         setDrawerOpen(true);
         setSidebarOpen(true);
     }
@@ -80,12 +88,14 @@ export default function Task() {
 
     const handleDrawerClose = () => {
         setDrawerOpen(false);
+        setSidebarOpen(false); // Also close sidebar
         setIsAddMode(false);
         setViewedTask(null);
         resetAddData();
     }
 
     const handleSidebarClose = () => {
+        setDrawerOpen(false); // Also close drawer
         setSidebarOpen(false);
         setViewedTask(null);
     }
