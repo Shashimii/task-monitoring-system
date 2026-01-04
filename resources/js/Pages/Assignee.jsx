@@ -22,12 +22,12 @@ export default function Assignee({ employees = [], divisions = [] }) {
     const urlParams = new URLSearchParams(queryString);
     let sort = urlParams.get('sort') || 'asc';
     let search = urlParams.get('search') || '';
-    
+
     // Clean Sort Value
     if (sort !== 'asc' && sort !== 'desc') {
         sort = 'asc';
     }
-    
+
     const [sortValue, setSortValue] = useState(sort);
     const [searchValue, setSearchValue] = useState(search);
     const isInitialMount = useRef(true);
@@ -40,7 +40,7 @@ export default function Assignee({ employees = [], divisions = [] }) {
     // Update URL when sort or search changes
     useEffect(() => {
         const currentUrlParams = new URLSearchParams(window.location.search);
-        
+
         if (isInitialMount.current) {
             isInitialMount.current = false;
             // On initial mount, only update URL if parameters are missing
@@ -112,7 +112,7 @@ export default function Assignee({ employees = [], divisions = [] }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         if (editingId) {
             patch(route('assignee.update', editingId), {
                 preserveScroll: true,
@@ -165,58 +165,75 @@ export default function Assignee({ employees = [], divisions = [] }) {
             header="Assignee List"
         >
             <Head title="Assignee" />
-            
+
             <MainContainer>
                 <div className="space-y-8">
                     {/* Add/Edit Form */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                    <div className={`bg-white rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 ${editingId ? 'dark:bg-amber-900' : 'dark:bg-emerald-900'}`}>
                         <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
                             {editingId ? 'Edit Employee' : 'Add Employee'}
                         </h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <PrimaryInput
-                                    type="text"
-                                    label="First Name"
-                                    placeholder="Enter first name"
-                                    value={data.first_name}
-                                    onChange={(e) => setData('first_name', e.target.value)}
-                                    error={errors.first_name}
-                                />
-                                <PrimaryInput
-                                    type="text"
-                                    label="Last Name"
-                                    placeholder="Enter last name"
-                                    value={data.last_name}
-                                    onChange={(e) => setData('last_name', e.target.value)}
-                                    error={errors.last_name}
-                                />
-                                <PrimaryInput
-                                    type="text"
-                                    label="Position"
-                                    placeholder="Enter position"
-                                    value={data.position}
-                                    onChange={(e) => setData('position', e.target.value)}
-                                    error={errors.position}
-                                />
-                                <SelectInput
-                                    label="Division"
-                                    placeholder="Select division"
-                                    value={data.division_id || undefined}
-                                    onChange={(value) => setData('division_id', value)}
-                                    error={errors.division_id}
-                                >
-                                    {divisions.map((division) => (
-                                        <SelectItem key={division.id} value={String(division.id)}>
-                                            {division.division_name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectInput>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-black dark:text-white">
+                                        First Name
+                                    </label>
+                                    <PrimaryInput
+                                        type="text"
+                                        placeholder="Enter first name"
+                                        value={data.first_name}
+                                        onChange={(e) => setData('first_name', e.target.value)}
+                                        error={errors.first_name}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-black dark:text-white">
+                                        Last Name
+                                    </label>
+                                    <PrimaryInput
+                                        type="text"
+                                        placeholder="Enter last name"
+                                        value={data.last_name}
+                                        onChange={(e) => setData('last_name', e.target.value)}
+                                        error={errors.last_name}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-black dark:text-white">
+                                        Position
+                                    </label>
+                                    <PrimaryInput
+                                        type="text"
+                                        placeholder="Enter position"
+                                        value={data.position}
+                                        onChange={(e) => setData('position', e.target.value)}
+                                        error={errors.position}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-black dark:text-white">
+                                        Division
+                                    </label>
+                                    <SelectInput
+                                        placeholder="Select division"
+                                        value={data.division_id || undefined}
+                                        onChange={(value) => setData('division_id', value)}
+                                        error={errors.division_id}
+                                    >
+                                        {divisions.map((division) => (
+                                            <SelectItem key={division.id} value={String(division.id)}>
+                                                {division.division_name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectInput>
+                                </div>
                             </div>
                             <div className="flex gap-2">
                                 <PrimaryButton
                                     type="submit"
                                     disabled={processing}
+                                    className="bg-zinc-800 hover:bg-zinc-900 cursor-pointer"
                                 >
                                     {processing ? 'Saving...' : (editingId ? 'Update' : 'Add')}
                                 </PrimaryButton>
@@ -225,7 +242,7 @@ export default function Assignee({ employees = [], divisions = [] }) {
                                         type="button"
                                         onClick={handleCancel}
                                         disabled={processing}
-                                        className="bg-gray-500 hover:bg-gray-600"
+                                        className="bg-zinc-800 hover:bg-zinc-900 cursor-pointer"
                                     >
                                         Cancel
                                     </PrimaryButton>

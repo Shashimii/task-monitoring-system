@@ -22,12 +22,12 @@ export default function Division({ divisions = [] }) {
     const urlParams = new URLSearchParams(queryString);
     let sort = urlParams.get('sort') || 'asc';
     let search = urlParams.get('search') || '';
-    
+
     // Clean Sort Value
     if (sort !== 'asc' && sort !== 'desc') {
         sort = 'asc';
     }
-    
+
     const [sortValue, setSortValue] = useState(sort);
     const [searchValue, setSearchValue] = useState(search);
     const isInitialMount = useRef(true);
@@ -40,7 +40,7 @@ export default function Division({ divisions = [] }) {
     // Update URL when sort or search changes
     useEffect(() => {
         const currentUrlParams = new URLSearchParams(window.location.search);
-        
+
         if (isInitialMount.current) {
             isInitialMount.current = false;
             // On initial mount, only update URL if parameters are missing
@@ -108,7 +108,7 @@ export default function Division({ divisions = [] }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         if (editingId) {
             patch(route('division.update', editingId), {
                 preserveScroll: true,
@@ -161,25 +161,29 @@ export default function Division({ divisions = [] }) {
             header="Division List"
         >
             <Head title="Division" />
-            
+
             <MainContainer>
                 <div className="space-y-8">
                     {/* Add/Edit Form */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                    <div className={`bg-white rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 ${editingId ? 'dark:bg-amber-900' : 'dark:bg-emerald-900'}`}>
                         <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
                             {editingId ? 'Edit Division' : 'Add Division'}
                         </h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <PrimaryInput
-                                    type="text"
-                                    label="Division Name"
-                                    placeholder="Enter division name"
-                                    value={data.division_name}
-                                    onChange={(e) => setData('division_name', e.target.value)}
-                                    error={errors.division_name}
-                                />
-                                <div className="space-y-2">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-black dark:text-white">
+                                        Division Name
+                                    </label>
+                                    <PrimaryInput
+                                        type="text"
+                                        placeholder="Enter division name"
+                                        value={data.division_name}
+                                        onChange={(e) => setData('division_name', e.target.value)}
+                                        error={errors.division_name}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
                                     <label className="text-black dark:text-white">
                                         Division Color
                                     </label>
@@ -188,14 +192,14 @@ export default function Division({ divisions = [] }) {
                                             type="color"
                                             value={data.division_color}
                                             onChange={(e) => setData('division_color', e.target.value)}
-                                            className="h-10 w-20 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                                            className="h-10 w-20 cursor-pointer"
                                         />
                                         <input
                                             type="text"
                                             value={data.division_color}
                                             onChange={(e) => setData('division_color', e.target.value)}
                                             placeholder="#FF6B6B"
-                                            className="flex-1 h-10 px-3 rounded-md border border-input bg-background text-sm shadow-sm ring-offset-background focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            className="flex-1 h-10 px-3 rounded-md border border-input bg-background text-sm shadow-sm ring-offset-background focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-black dark:border-stone-800 dark:text-white"
                                         />
                                     </div>
                                     <p className="text-red-600 dark:text-red-500">{errors.division_color}</p>
@@ -205,6 +209,7 @@ export default function Division({ divisions = [] }) {
                                 <PrimaryButton
                                     type="submit"
                                     disabled={processing}
+                                    className="bg-zinc-800 hover:bg-zinc-900 cursor-pointer"
                                 >
                                     {processing ? 'Saving...' : (editingId ? 'Update' : 'Add')}
                                 </PrimaryButton>
@@ -213,7 +218,7 @@ export default function Division({ divisions = [] }) {
                                         type="button"
                                         onClick={handleCancel}
                                         disabled={processing}
-                                        className="bg-gray-500 hover:bg-gray-600"
+                                        className="bg-zinc-800 hover:bg-zinc-900 cursor-pointer"
                                     >
                                         Cancel
                                     </PrimaryButton>
@@ -284,7 +289,7 @@ export default function Division({ divisions = [] }) {
                                                     <div className="flex justify-center gap-2">
                                                         <button
                                                             onClick={() => handleEdit(division)}
-                                                            className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                                                            className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors cursor-pointer"
                                                             title="Edit"
                                                         >
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -293,7 +298,7 @@ export default function Division({ divisions = [] }) {
                                                         </button>
                                                         <button
                                                             onClick={() => handleDelete(division.id)}
-                                                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors cursor-pointer"
                                                             title="Delete"
                                                         >
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
