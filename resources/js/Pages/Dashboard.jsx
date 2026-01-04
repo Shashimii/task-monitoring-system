@@ -7,12 +7,31 @@ import TableHeader from '@/Components/Table/TableHeader';
 import TableRow from '@/Components/Table/TableRow';
 import TableData from '@/Components/Table/TableData';
 import DivisionContainer from '@/Components/Misc/DivisionContainer';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import { useEffect } from 'react';
 import { PieChart, Pie, Cell, LabelList } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/Components/ui/chart';
 
 export default function Dashboard({ task_counts = {}, recent_tasks = [], tasks_by_division = [] }) {
+
+    // Polling: Fetch latest data from backend
+    useEffect(() => {
+        // Poll every 30 seconds
+        const pollInterval = setInterval(() => {
+            // Reload data
+            router.get(route('dashboard.index'), {}, {
+                preserveState: true,
+                preserveScroll: true,
+                only: ['task_counts', 'recent_tasks', 'tasks_by_division'],
+            });
+        }, 30000); // 30 seconds
+
+        // Cleanup interval on unmount
+        return () => {
+            clearInterval(pollInterval);
+        };
+    }, []);
 
     // Prepare data for the pie chart
     const chartData = tasks_by_division
