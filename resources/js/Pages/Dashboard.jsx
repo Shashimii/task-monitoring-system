@@ -8,8 +8,44 @@ import TableRow from '@/Components/Table/TableRow';
 import TableData from '@/Components/Table/TableData';
 import DivisionContainer from '@/Components/Misc/DivisionContainer';
 import { Head } from '@inertiajs/react';
+import { PieChart, Pie, Cell, LabelList } from 'recharts';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/Components/ui/chart';
 
 export default function Dashboard({ task_counts = {}, recent_tasks = [], tasks_by_division = [] }) {
+
+    // Prepare data for the pie chart
+    const chartData = tasks_by_division
+        .map((division) => ({
+            name: division.division_name,
+            value: division.total_tasks || 0,
+            fill: division.division_color || '#3B82F6',
+        }))
+        .filter(item => item.value > 0); // Only include divisions with tasks
+
+    // Sort the data by value in ascending order (smallest to largest) for better visual effect
+    const sortedChartData = [...chartData].sort((a, b) => a.value - b.value);
+
+    // Calculate total for percentage calculation
+    const totalTasks = chartData.reduce((sum, item) => sum + item.value, 0);
+
+    // Configure the size increase between each pie ring
+    const BASE_RADIUS = 50; // Starting radius for the smallest pie
+    const SIZE_INCREMENT = 10; // How much to increase radius for each subsequent pie
+
+    // Create chart config for tooltips
+    const chartConfig = {
+        value: {
+            label: "Tasks",
+        },
+        ...chartData.reduce((acc, item, index) => {
+            acc[item.name.toLowerCase().replace(/\s+/g, '_')] = {
+                label: item.name,
+                color: item.fill,
+            };
+            return acc;
+        }, {}),
+    };
 
     const DivisionCard = ({ division }) => {
         return (
@@ -128,10 +164,104 @@ export default function Dashboard({ task_counts = {}, recent_tasks = [], tasks_b
                         </PrimaryCard>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-2">
+                        <div className="space-y-4">
+                            <h1 className="text-3xl font-semibold">🚩 Task by Division</h1>
+                            {sortedChartData.length > 0 && totalTasks > 0 ? (
+                                <Card className="flex flex-col bg-white dark:bg-zinc-900 border-gray-200 dark:border-gray-700">
+                                    <CardContent className="flex-1">
+                                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                                            <div className="w-full md:w-1/2 lg:w-2/5 min-w-0">
+                                                <div className="w-full h-[300px] min-h-[250px]">
+                                                    <ChartContainer
+                                                        config={chartConfig}
+                                                        className="[&_.recharts-text]:fill-background"
+                                                    >
+                                                        <PieChart>
+                                                            <ChartTooltip
+                                                                content={<ChartTooltipContent nameKey="name" hideLabel />}
+                                                            />
+                                                            {sortedChartData.map((entry, index) => (
+                                                                <Pie
+                                                                    key={`pie-${index}`}
+                                                                    data={[entry]}
+                                                                    innerRadius={30}
+                                                                    outerRadius={BASE_RADIUS + index * SIZE_INCREMENT}
+                                                                    dataKey="value"
+                                                                    cornerRadius={4}
+                                                                    startAngle={
+                                                                        // Calculate the percentage of total tasks up to current index
+                                                                        (sortedChartData
+                                                                            .slice(0, index)
+                                                                            .reduce((sum, d) => sum + d.value, 0) /
+                                                                            sortedChartData.reduce((sum, d) => sum + d.value, 0)) *
+                                                                        360
+                                                                    }
+                                                                    endAngle={
+                                                                        // Calculate the percentage of total tasks up to and including current index
+                                                                        (sortedChartData
+                                                                            .slice(0, index + 1)
+                                                                            .reduce((sum, d) => sum + d.value, 0) /
+                                                                            sortedChartData.reduce((sum, d) => sum + d.value, 0)) *
+                                                                        360
+                                                                    }
+                                                                >
+                                                                    <Cell fill={entry.fill} />
+                                                                    <LabelList
+                                                                        dataKey="value"
+                                                                        stroke="none"
+                                                                        fontSize={12}
+                                                                        fontWeight={500}
+                                                                        fill="white"
+                                                                        formatter={(value) => value.toString()}
+                                                                    />
+                                                                </Pie>
+                                                            ))}
+                                                        </PieChart>
+                                                    </ChartContainer>
+                                                </div>
+                                            </div>
+                                            <div className="w-full md:w-1/2 lg:w-2/5 space-y-2">
+                                                {chartData.map((item) => {
+                                                    const percentage = ((item.value / totalTasks) * 100).toFixed(1);
+                                                    return (
+                                                        <div key={item.name} className="flex items-center justify-between text-sm">
+                                                            <div className="flex items-center space-x-2.5">
+                                                                <span
+                                                                    className="w-2.5 h-2.5 rounded-sm shrink-0"
+                                                                    style={{ backgroundColor: item.fill }}
+                                                                />
+                                                                <span className="text-gray-700 dark:text-gray-300 font-medium">
+                                                                    {item.name}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center space-x-2">
+                                                                <span className="font-semibold text-gray-900 dark:text-white tabular-nums">
+                                                                    {item.value}
+                                                                </span>
+                                                                <span className="text-gray-500 dark:text-gray-400 tabular-nums">
+                                                                    ({percentage}%)
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ) : (
+                                <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                                    <CardContent className="flex items-center justify-center py-8">
+                                        <div className="text-center text-gray-500 dark:text-gray-400">
+                                            No task by division
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </div>
+
                         <TableContainer
-                            tableIcon="🚩"
-                            tableTitle="Tasks by Division"
                             borderColor="border-purple-500"
                         >
                             {/* Desktop Table View */}
