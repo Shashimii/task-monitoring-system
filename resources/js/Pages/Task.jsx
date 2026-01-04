@@ -68,6 +68,34 @@ export default function Task() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [taskAll.data, notStarted.data, inProgress.data, completed.data]);
 
+    // Polling: Fetch latest data from backend
+    useEffect(() => {
+        // Don't poll if drawer or sidebar is open to avoid conflicts
+        if (drawerOpen || sidebarOpen) {
+            return;
+        }
+
+        // Poll every 30 seconds
+        const pollInterval = setInterval(() => {
+            // Get current URL parameters to preserve them
+            const currentParams = Object.fromEntries(
+                new URLSearchParams(window.location.search)
+            );
+
+            // Reload data with current parameters
+            router.get(route('task.index'), currentParams, {
+                preserveState: true,
+                preserveScroll: true,
+                only: ['taskAll', 'notStarted', 'inProgress', 'completed', 'employees_data', 'divisions_data'],
+            });
+        }, 30000); // 30 seconds
+
+        // Cleanup interval on unmount or when drawer/sidebar opens
+        return () => {
+            clearInterval(pollInterval);
+        };
+    }, [drawerOpen, sidebarOpen]);
+
     const handleTaskClick = (task) => {
         setViewedTask(task);
         setIsAddMode(false);
