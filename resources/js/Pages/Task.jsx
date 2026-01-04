@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import MainContainer from "@/Components/DivContainer/MainContainer";
 import TaskTable from '@/Components/Table/TaskTable';
+import TaskList from '@/Components/Task/TaskList';
+import TaskDrawer from '@/Components/Task/TaskDrawer';
 import Sidebar from "@/Components/Sidebar";
 
 
@@ -20,12 +22,17 @@ export default function Task() {
     } = props;
 
 
-    // Sidebar
-    const [open, setOpen] = useState(false);
+    // Sidebar state (Desktop)
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    
+    // Drawer state (Mobile/Tablet)
+    const [drawerOpen, setDrawerOpen] = useState(false);
     const [viewedTask, setViewedTask] = useState(null);
+    const [isAddMode, setIsAddMode] = useState(false);
+    const [activeTableType, setActiveTableType] = useState('');
 
     useEffect(() => {
-        if (open) {
+        if (drawerOpen || sidebarOpen) {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'auto';
@@ -34,7 +41,7 @@ export default function Task() {
         return () => {
             document.body.style.overflow = 'auto';
         }
-    }, [open]);
+    }, [drawerOpen, sidebarOpen]);
 
     // Sync viewedTask with updated task data from props
     useEffect(() => {
@@ -54,9 +61,33 @@ export default function Task() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [taskAll.data, notStarted.data, inProgress.data, completed.data]);
 
-    const handleRowClick = (task) => {
-        setOpen(true);
+    const handleTaskClick = (task) => {
         setViewedTask(task);
+        setIsAddMode(false);
+        // Use drawer for mobile, sidebar for desktop
+        // We'll detect screen size or use CSS to show/hide
+        setDrawerOpen(true);
+        setSidebarOpen(true);
+    }
+
+    const handleAddClick = (tableType) => {
+        setActiveTableType(tableType);
+        setViewedTask(null);
+        setIsAddMode(true);
+        setDrawerOpen(true);
+        resetAddData();
+    }
+
+    const handleDrawerClose = () => {
+        setDrawerOpen(false);
+        setIsAddMode(false);
+        setViewedTask(null);
+        resetAddData();
+    }
+
+    const handleSidebarClose = () => {
+        setSidebarOpen(false);
+        setViewedTask(null);
     }
 
     // Add Task
@@ -184,13 +215,86 @@ export default function Task() {
             <Head title="Tasks" />
 
             <MainContainer>
-                <Sidebar
-                    open={open}
-                    task={viewedTask}
-                    onClose={() => setOpen(false)}
-                />
+                {/* Sidebar - Desktop Only */}
+                <div className="hidden md:block">
+                    <Sidebar
+                        open={sidebarOpen}
+                        task={viewedTask}
+                        onClose={handleSidebarClose}
+                    />
+                </div>
 
-                <div className="flex flex-col gap-8">
+                {/* Task Drawer - Mobile/Tablet Only */}
+                <div className="md:hidden">
+                    <TaskDrawer
+                        open={drawerOpen}
+                        onClose={handleDrawerClose}
+                        task={viewedTask}
+                        employees_data={employees_data}
+                        divisions_data={divisions_data}
+                        editData={editDataTaskAll}
+                        setEditData={setEditDataTaskAll}
+                        postEditData={postEditDataTaskAll}
+                        editProcessing={editProcessingTaskAll}
+                        resetEditData={resetEditDataTaskAll}
+                        editErrors={editErrorsTaskAll}
+                        deleteTask={deleteTask}
+                        isAddMode={isAddMode}
+                        addData={addData}
+                        setDataAdd={setDataAdd}
+                        postAddData={postAddData}
+                        addProcessing={addProcessing}
+                        resetAddData={resetAddData}
+                        addErrors={addErrors}
+                        tableType={activeTableType}
+                    />
+                </div>
+
+                {/* Task Lists - Mobile/Tablet Only */}
+                <div className="flex flex-col gap-6 md:gap-8 md:hidden">
+                    <TaskList
+                        borderColor="border-violet-600"
+                        title="All Tasks"
+                        icon="📄"
+                        data={taskAll.data}
+                        onTaskClick={handleTaskClick}
+                        onAddClick={() => handleAddClick('task_all')}
+                        showAddButton={true}
+                    />
+
+                    <TaskList
+                        borderColor="border-gray-600"
+                        title="Not Started"
+                        icon="❌"
+                        data={notStarted.data}
+                        onTaskClick={handleTaskClick}
+                        onAddClick={() => handleAddClick('not_started')}
+                        showAddButton={true}
+                    />
+
+                    <TaskList
+                        borderColor="border-orange-600"
+                        title="In Progress"
+                        icon="⌛"
+                        data={inProgress.data}
+                        onTaskClick={handleTaskClick}
+                        onAddClick={() => handleAddClick('in_progress')}
+                        showAddButton={true}
+                    />
+
+                    <TaskList
+                        borderColor="border-green-600"
+                        title="Completed"
+                        icon="✅"
+                        data={completed.data}
+                        onTaskClick={handleTaskClick}
+                        onAddClick={() => handleAddClick('completed')}
+                        showAddButton={true}
+                    />
+                </div>
+
+                {/* Task Tables - Desktop Only */}
+                <div className="hidden md:flex flex-col gap-8">
                     <TaskTable
                         borderColor="border-violet-600"
                         tableTitle="All Tasks"
@@ -216,7 +320,7 @@ export default function Task() {
                         resetEditData={resetEditDataTaskAll}
                         editErrors={editErrorsTaskAll}
                         deleteTask={deleteTask}
-                        onRowClick={handleRowClick}
+                        onRowClick={handleTaskClick}
                         tableType="task_all"
                     />
 
@@ -245,7 +349,7 @@ export default function Task() {
                         resetEditData={resetEditDataNotStarted}
                         editErrors={editErrorsNotStarted}
                         deleteTask={deleteTask}
-                        onRowClick={handleRowClick}
+                        onRowClick={handleTaskClick}
                         tableType="not_started"
                     />
 
@@ -274,7 +378,7 @@ export default function Task() {
                         resetEditData={resetEditDataInProgress}
                         editErrors={editErrorsInProgress}
                         deleteTask={deleteTask}
-                        onRowClick={handleRowClick}
+                        onRowClick={handleTaskClick}
                         tableType="in_progress"
                     />
 
@@ -303,7 +407,7 @@ export default function Task() {
                         resetEditData={resetEditDataCompleted}
                         editErrors={editErrorsCompleted}
                         deleteTask={deleteTask}
-                        onRowClick={handleRowClick}
+                        onRowClick={handleTaskClick}
                         tableType="completed"
                     />
                 </div>

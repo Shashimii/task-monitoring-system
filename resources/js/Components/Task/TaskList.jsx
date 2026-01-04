@@ -1,0 +1,72 @@
+import PriorityContainer from '../Misc/PriorityContainer';
+import StatusContainer from '../Misc/StatusContainer';
+import PrimaryButton from '../Button/PrimaryButton';
+
+export default function TaskList({
+    title,
+    icon,
+    borderColor,
+    data = [],
+    onTaskClick,
+    onAddClick,
+    showAddButton = true
+}) {
+    return (
+        <div className="rounded-lg p-4 space-y-3">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                    <span className="text-2xl">{icon}</span>
+                    <h2 className="text-xl font-semibold">{title}</h2>
+                </div>
+            </div>
+
+            {/* Add Button */}
+            {showAddButton && (
+                <PrimaryButton
+                    text="➕ Add Task"
+                    onClick={onAddClick}
+                />
+            )}
+
+            {/* Task List */}
+            <div className="space-y-2">
+                {data.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                        No tasks found.
+                    </div>
+                ) : (
+                    data.map((task) => (
+                        <div
+                            key={task.id}
+                            onClick={() => onTaskClick(task)}
+                            className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors active:scale-[0.98]"
+                        >
+                            {/* Task Name */}
+                            <h3 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white line-clamp-2">
+                                {task.name}
+                            </h3>
+
+                            {/* Priority and Status */}
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">Priority:</span>
+                                    <PriorityContainer priority={task.priority}>
+                                        {task.priority || 'No priority'}
+                                    </PriorityContainer>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">Status:</span>
+                                    <StatusContainer status={task.status}>
+                                        {task.status}
+                                    </StatusContainer>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+    );
+}
+
