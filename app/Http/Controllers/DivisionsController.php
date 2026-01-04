@@ -12,9 +12,16 @@ class DivisionsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $divisions = Division::orderBy('division_name', 'asc')->get();
+        $sort = $request->get('sort', 'asc');
+        
+        // Validate sort order
+        if ($sort !== 'asc' && $sort !== 'desc') {
+            $sort = 'asc';
+        }
+
+        $divisions = Division::orderBy('division_name', $sort)->get();
 
         return Inertia::render('Division', [
             'divisions' => $divisions,
