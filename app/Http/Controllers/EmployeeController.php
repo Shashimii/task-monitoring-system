@@ -16,13 +16,28 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
         $sort = $request->get('sort', 'asc');
+        $search = $request->get('search', '');
         
         // Validate sort order
         if ($sort !== 'asc' && $sort !== 'desc') {
             $sort = 'asc';
         }
 
-        $employees = Employee::with('division')->orderBy('last_name', $sort)->get();
+        $query = Employee::with('division');
+
+        // Apply search filter
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', '%' . $search . '%')
+                  ->orWhere('last_name', 'like', '%' . $search . '%')
+                  ->orWhere('position', 'like', '%' . $search . '%')
+                  ->orWhereHas('division', function ($divQuery) use ($search) {
+                      $divQuery->where('division_name', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+
+        $employees = $query->orderBy('last_name', $sort)->get();
         $divisions = Division::orderBy('division_name', 'asc')->get();
 
         return Inertia::render('Assignee', [

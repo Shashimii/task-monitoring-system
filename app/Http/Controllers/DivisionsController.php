@@ -15,13 +15,24 @@ class DivisionsController extends Controller
     public function index(Request $request)
     {
         $sort = $request->get('sort', 'asc');
+        $search = $request->get('search', '');
         
         // Validate sort order
         if ($sort !== 'asc' && $sort !== 'desc') {
             $sort = 'asc';
         }
 
-        $divisions = Division::orderBy('division_name', $sort)->get();
+        $query = Division::query();
+
+        // Apply search filter
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('division_name', 'like', '%' . $search . '%')
+                  ->orWhere('division_color', 'like', '%' . $search . '%');
+            });
+        }
+
+        $divisions = $query->orderBy('division_name', $sort)->get();
 
         return Inertia::render('Division', [
             'divisions' => $divisions,

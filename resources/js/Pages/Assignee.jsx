@@ -17,10 +17,11 @@ import { toast } from 'sonner';
 export default function Assignee({ employees = [], divisions = [] }) {
     const [editingId, setEditingId] = useState(null);
 
-    // Sorting
+    // Sorting and Search
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     let sort = urlParams.get('sort') || 'asc';
+    let search = urlParams.get('search') || '';
     
     // Clean Sort Value
     if (sort !== 'asc' && sort !== 'desc') {
@@ -28,20 +29,28 @@ export default function Assignee({ employees = [], divisions = [] }) {
     }
     
     const [sortValue, setSortValue] = useState(sort);
+    const [searchValue, setSearchValue] = useState(search);
     const isInitialMount = useRef(true);
 
-    // Update URL when sort changes
+    // Handle search change
+    const handleSearchChange = (value) => {
+        setSearchValue(value);
+    };
+
+    // Update URL when sort or search changes
     useEffect(() => {
         const currentUrlParams = new URLSearchParams(window.location.search);
         
         if (isInitialMount.current) {
             isInitialMount.current = false;
-            // On initial mount, only update URL if sort parameter is missing
-            if (!currentUrlParams.has('sort')) {
+            // On initial mount, only update URL if parameters are missing
+            const needsUpdate = !currentUrlParams.has('sort') || !currentUrlParams.has('search');
+            if (needsUpdate) {
                 const currentParams = Object.fromEntries(currentUrlParams);
                 const searchUrl = {
                     ...currentParams,
                     sort: sortValue,
+                    search: searchValue,
                 };
                 router.get(route('assignee.index'), searchUrl, {
                     preserveState: true,
@@ -57,6 +66,7 @@ export default function Assignee({ employees = [], divisions = [] }) {
         const searchUrl = {
             ...currentParams,
             sort: sortValue,
+            search: searchValue,
         };
 
         router.get(route('assignee.index'), searchUrl, {
@@ -64,7 +74,7 @@ export default function Assignee({ employees = [], divisions = [] }) {
             preserveScroll: true,
             replace: true
         });
-    }, [sortValue]);
+    }, [sortValue, searchValue]);
 
     // Add/Edit Form
     const {
@@ -230,7 +240,14 @@ export default function Assignee({ employees = [], divisions = [] }) {
                         tableTitle="Employees"
                         borderColor="border-blue-500"
                         headerContent={
-                            <div className="mb-4">
+                            <div className="mb-4 flex gap-4">
+                                <PrimaryInput
+                                    type="text"
+                                    placeholder="Search name, position, or division..."
+                                    value={searchValue}
+                                    onChange={(e) => handleSearchChange(e.target.value)}
+                                    className="flex-1 w-[22rem]"
+                                />
                                 <SelectInput
                                     placeholder="Sort Order"
                                     value={sortValue}
