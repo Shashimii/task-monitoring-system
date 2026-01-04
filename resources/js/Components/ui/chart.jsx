@@ -91,8 +91,33 @@ const ChartTooltip = RechartsPrimitive.Tooltip
 
 // Chart tooltip content component
 const ChartTooltipContent = React.forwardRef(
-  ({ active, payload, label, nameKey, labelKey, indicator = "line", nameKeyFormatter, labelFormatter, ...props }, ref) => {
+  ({ active, payload, label, nameKey, labelKey, indicator = "line", nameKeyFormatter, labelFormatter, hideLabel, ...props }, ref) => {
+    // Filter out Recharts-specific props that shouldn't be passed to DOM elements
+    const {
+      allowEscapeViewBox,
+      animationDuration,
+      animationEasing,
+      axisId,
+      contentStyle,
+      cursor,
+      filterNull,
+      includeHidden,
+      isAnimationActive,
+      itemSorter,
+      itemStyle,
+      labelStyle,
+      reverseDirection,
+      useTranslate3d,
+      wrapperStyle,
+      activeIndex,
+      accessibilityLayer,
+      ...domProps
+    } = props
+
     const tooltipLabel = React.useMemo(() => {
+      if (hideLabel) {
+        return null
+      }
       if (labelFormatter) {
         return labelFormatter(label)
       }
@@ -103,7 +128,7 @@ const ChartTooltipContent = React.forwardRef(
         return label
       }
       return null
-    }, [label, labelKey, labelFormatter, payload])
+    }, [label, labelKey, labelFormatter, payload, hideLabel])
 
     if (!active || !payload?.length) {
       return null
@@ -116,7 +141,7 @@ const ChartTooltipContent = React.forwardRef(
           "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
           "animate-in fade-in-0 zoom-in-95"
         )}
-        {...props}
+        {...domProps}
       >
         {tooltipLabel && (
           <div className="font-medium leading-none tracking-tight text-muted-foreground">
