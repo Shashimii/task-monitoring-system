@@ -14,7 +14,11 @@ class DivisionsController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Division', []);
+        $divisions = Division::orderBy('division_name', 'asc')->get();
+
+        return Inertia::render('Division', [
+            'divisions' => $divisions,
+        ]);
     }
 
     /**
@@ -30,7 +34,17 @@ class DivisionsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'division_name' => 'required|string|max:255|unique:divisions,division_name',
+            'division_color' => 'required|string|max:7|regex:/^#[0-9A-Fa-f]{6}$/',
+        ]);
+
+        Division::create([
+            'division_name' => $validated['division_name'],
+            'division_color' => $validated['division_color'],
+        ]);
+
+        return back()->with('success', 'Division added successfully!');
     }
 
     /**
@@ -54,7 +68,17 @@ class DivisionsController extends Controller
      */
     public function update(Request $request, Division $division)
     {
-        //
+        $validated = $request->validate([
+            'division_name' => 'required|string|max:255|unique:divisions,division_name,' . $division->id,
+            'division_color' => 'required|string|max:7|regex:/^#[0-9A-Fa-f]{6}$/',
+        ]);
+
+        $division->update([
+            'division_name' => $validated['division_name'],
+            'division_color' => $validated['division_color'],
+        ]);
+
+        return back()->with('success', 'Division updated successfully!');
     }
 
     /**
@@ -62,6 +86,8 @@ class DivisionsController extends Controller
      */
     public function destroy(Division $division)
     {
-        //
+        $division->delete();
+
+        return back()->with('success', 'Division deleted successfully!');
     }
 }
