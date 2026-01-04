@@ -141,7 +141,7 @@ export default function Assignee({ employees = [], divisions = [] }) {
     };
 
     const handleDelete = (employeeId) => {
-        if (!confirm("Are you sure you want to delete this employee?")) return;
+        if (!confirm("Are you sure you want to delete this employee? Deleting assignees will also remove their tasks.")) return;
 
         toast.loading("Deleting employee...");
 
@@ -171,7 +171,7 @@ export default function Assignee({ employees = [], divisions = [] }) {
                     {/* Add/Edit Form */}
                     <div className={`bg-white rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 ${editingId ? 'dark:bg-amber-900' : 'dark:bg-emerald-900'}`}>
                         <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                            {editingId ? 'Edit Employee' : 'Add Employee'}
+                            {editingId ? 'Edit Assignee' : 'Add Assignee'}
                         </h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -254,7 +254,7 @@ export default function Assignee({ employees = [], divisions = [] }) {
                     {/* Employee List */}
                     <TableContainer
                         tableIcon="👥"
-                        tableTitle="Employees"
+                        tableTitle="Assignees"
                         borderColor="border-blue-500"
                         headerContent={
                             <div className="mb-4 flex gap-4">
@@ -313,7 +313,7 @@ export default function Assignee({ employees = [], divisions = [] }) {
                                                     <div className="flex justify-center gap-2">
                                                         <button
                                                             onClick={() => handleEdit(employee)}
-                                                            className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                                                            className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors cursor-pointer"
                                                             title="Edit"
                                                         >
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -322,7 +322,7 @@ export default function Assignee({ employees = [], divisions = [] }) {
                                                         </button>
                                                         <button
                                                             onClick={() => handleDelete(employee.id)}
-                                                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors cursor-pointer"
                                                             title="Delete"
                                                         >
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
